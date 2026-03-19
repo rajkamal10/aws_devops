@@ -10,5 +10,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Validate CloudFormation
-        run: aws cloudformation validate-template --template-body file://s3-bucket-stack.yml
+      - name: Validate CloudFormation template
+        run: aws cloudformation validate-template \
+            --template-body file://s3-bucket-stack.yml \
+            --region ap-south-1
