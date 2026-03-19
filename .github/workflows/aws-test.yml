@@ -1,7 +1,14 @@
 name: AWS OIDC Test
 
 on:
-  workflow_dispatch:   # allows you to trigger manually from GitHub Actions tab
+  workflow_dispatch:   # allows manual trigger from Actions tab
+  push:
+    branches:
+      - main           # optional: run automatically on main branch
+
+permissions:
+  id-token: write       # REQUIRED for OIDC
+  contents: read        # needed for checkout
 
 jobs:
   test-aws:
@@ -15,6 +22,6 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::844099234941:role/github_action_role
           aws-region: ap-south-1
-         
+
       - name: Verify AWS identity
         run: aws sts get-caller-identity
