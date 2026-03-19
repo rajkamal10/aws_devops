@@ -1,0 +1,19 @@
+name: AWS OIDC Test
+
+on:
+  workflow_dispatch:   # allows you to trigger manually from GitHub Actions tab
+
+jobs:
+  test-aws:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::844099234941:role/github_action_role
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
