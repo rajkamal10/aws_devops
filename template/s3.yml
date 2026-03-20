@@ -13,3 +13,8 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+
+Outputs:
+  BucketName:
+    Description: Name of the deployment bucket
+    Value: !Ref AppDeploymentBucket

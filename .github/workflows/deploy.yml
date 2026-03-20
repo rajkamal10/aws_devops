@@ -1,4 +1,4 @@
-name: Deploy to AWS
+name: Deploy Production
 
 on:
   push:
@@ -13,17 +13,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Configure AWS credentials (OIDC)
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::844099234941:role/github_action_role
           aws-region: ap-south-1
-
-      - name: Deploy CloudFormation stack
-        run: |
-          aws cloudformation deploy \
-            --template-file s3.yml \
-            --stack-name app-deployment-stack \
-            --capabilities CAPABILITY_NAMED_IAM
-
+      - name: Install dependencies
+        run: pip install boto3 pyyaml
+      - name: Deploy production stack
+        run: python deploy_stack.py
