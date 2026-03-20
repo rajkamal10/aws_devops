@@ -3,3 +3,8 @@ stacks:
     template: template/s3.yml
     region: ap-south-1
     base_name: s3-app-stack
+
+  s3-app:
+    template: template/s3.yml
+    region: ap-south-1
+    base_name: s3-app-test
