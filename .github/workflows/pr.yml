@@ -1,16 +1,26 @@
-name: Validate PR
+name: PR Validation
+
 on:
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   validate:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Validate CloudFormation template
-        run: aws cloudformation validate-template \
-              --template-body file://s3-bucket-stack.yml \
-              --region ap-south-1
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::844099234941:role/github_action_role
+          aws-region: ap-south-1
+
+      - name: Lint CloudFormation
+        run: |
+          pip install cfn-lint
+          cfn-lint s3.yml
