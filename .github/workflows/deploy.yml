@@ -1,28 +1,33 @@
 name: Deploy to AWS
+
 on:
   push:
-    branches:
-      - main
-
-permissions:
-  id-token: write
-  contents: read
+    branches: [ main ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Configure AWS credentials
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::844099234941:role/github_action_role
           aws-region: ap-south-1
+
       - name: Deploy CloudFormation stack
         run: |
           aws cloudformation deploy \
-            --template-file s3-bucket-stack.yml \
-            --stack-name my-s3-bucket-stack \
-            --parameter-overrides BucketName=rajkamal10-devops-bucket \
+            --template-file s3.yml \
+            --stack-name app-deployment-stack \
             --capabilities CAPABILITY_NAMED_IAM
+
+      - name: Build and Sync to S3
+        run: |
+          npm install && npm run build
+          aws s3 sync ./build s3://app-deployment-stack-deployments
