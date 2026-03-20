@@ -7,4 +7,4 @@ stacks:
   s3-app:
     template: template/s3.yml
     region: ap-south-1
-    base_name: s3-app-test
+    base_name: s3-app-prod
