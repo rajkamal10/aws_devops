@@ -1,0 +1,47 @@
+import boto3
+import sys
+import os
+from botocore.exceptions import ClientError
+
+region = os.getenv("AWS_REGION", "ap-south-1")
+stack_base = "app-deployment-stack"
+pr_number = os.getenv("PR_NUMBER")  # GitHub sets this in PR workflows
+stack_name = f"{stack_base}-pr{pr_number}" if pr_number else stack_base
+
+cf = boto3.client("cloudformation", region_name=region)
+
+def stack_exists(name):
+    try:
+        cf.describe_stacks(StackName=name)
+        return True
+    except ClientError as e:
+        if "does not exist" in str(e):
+            return False
+        raise
+
+def deploy_stack():
+    if stack_exists(stack_name):
+        print(f"Updating stack {stack_name}...")
+    else:
+        print(f"Creating stack {stack_name}...")
+    cf.deploy(
+        TemplateFile="s3.yml",
+        StackName=stack_name,
+        Capabilities=["CAPABILITY_NAMED_IAM"]
+    )
+
+def delete_stack():
+    if stack_exists(stack_name):
+        print(f"Deleting stack {stack_name}...")
+        cf.delete_stack(StackName=stack_name)
+    else:
+        print(f"Stack {stack_name} does not exist.")
+
+if __name__ == "__main__":
+    action = sys.argv[1] if len(sys.argv) > 1 else "deploy"
+    if action == "deploy":
+        deploy_stack()
+    elif action == "delete":
+        delete_stack()
+    else:
+        print("Usage: manage_stack.py [deploy|delete]")
