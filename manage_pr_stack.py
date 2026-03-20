@@ -40,10 +40,10 @@ def deploy_stack():
             )
             waiter = cf.get_waiter("stack_update_complete")
             waiter.wait(StackName=stack_name)
-            print(f"Stack {stack_name} updated successfully.")
+            print(f"✅ Stack {stack_name} updated successfully.")
         except ClientError as e:
             if "No updates are to be performed" in str(e):
-                print(f"No changes detected for {stack_name}. Skipping update.")
+                print(f"⚠️ No changes detected for {stack_name}. Skipping update.")
             else:
                 raise
     else:
@@ -55,7 +55,10 @@ def deploy_stack():
         )
         waiter = cf.get_waiter("stack_create_complete")
         waiter.wait(StackName=stack_name)
-        print(f"Stack {stack_name} created successfully.")
+        print(f"✅ Stack {stack_name} created successfully.")
+
+    # Always print the stack name at the end
+    print(f"📌 Managed stack: {stack_name}")
 
 def delete_stack():
     if stack_exists(stack_name):
@@ -63,9 +66,12 @@ def delete_stack():
         cf.delete_stack(StackName=stack_name)
         waiter = cf.get_waiter("stack_delete_complete")
         waiter.wait(StackName=stack_name)
-        print(f"Stack {stack_name} deleted successfully.")
+        print(f"🗑️ Stack {stack_name} deleted successfully.")
     else:
-        print(f"Stack {stack_name} does not exist. Nothing to delete.")
+        print(f"⚠️ Stack {stack_name} does not exist. Nothing to delete.")
+
+    # Always print the stack name at the end
+    print(f"📌 Managed stack: {stack_name}")
 
 if __name__ == "__main__":
     action = sys.argv[1] if len(sys.argv) > 1 else "deploy"
