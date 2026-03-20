@@ -27,7 +27,3 @@ jobs:
             --stack-name app-deployment-stack \
             --capabilities CAPABILITY_NAMED_IAM
 
-      - name: Build and Sync to S3
-        run: |
-          npm install && npm run build
-          aws s3 sync ./build s3://app-deployment-stack-deployments
