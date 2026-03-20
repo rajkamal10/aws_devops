@@ -10,17 +10,33 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      pull-requests: write   # needed to comment on PR
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::844099234941:role/github_action_role
           aws-region: ap-south-1
+
       - name: Install dependencies
         run: pip install boto3 pyyaml
+
       - name: Manage PR stack
+        id: manage
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: python manage_pr_stack.py deploy
+        run: |
+          python manage_pr_stack.py deploy > output.log
+          tail -n 1 output.log > stack_message.txt
+          echo "STACK_MESSAGE=$(cat stack_message.txt)" >> $GITHUB_ENV
+
+      - name: Comment on PR
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            🚀 Stack status for this PR:
+            ${{ env.STACK_MESSAGE }}
