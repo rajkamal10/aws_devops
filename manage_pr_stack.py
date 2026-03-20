@@ -31,7 +31,8 @@ def stack_exists(name):
 def deploy_stack():
     body = open(template_file).read()
     if stack_exists(stack_name):
-        print(f"Updating stack {stack_name}...")
+        print(f"🔄 Stack {stack_name} already exists.")
+        print(f"➡️ Stack will be updated...")
         try:
             cf.update_stack(
                 StackName=stack_name,
@@ -47,7 +48,8 @@ def deploy_stack():
             else:
                 raise
     else:
-        print(f"Creating stack {stack_name}...")
+        print(f"🆕 Stack {stack_name} does not exist.")
+        print(f"➡️ Stack will be created...")
         cf.create_stack(
             StackName=stack_name,
             TemplateBody=body,
@@ -62,15 +64,15 @@ def deploy_stack():
 
 def delete_stack():
     if stack_exists(stack_name):
-        print(f"Deleting stack {stack_name}...")
+        print(f"🗑️ Stack {stack_name} exists.")
+        print(f"➡️ Stack will be deleted...")
         cf.delete_stack(StackName=stack_name)
         waiter = cf.get_waiter("stack_delete_complete")
         waiter.wait(StackName=stack_name)
-        print(f"🗑️ Stack {stack_name} deleted successfully.")
+        print(f"✅ Stack {stack_name} deleted successfully.")
     else:
         print(f"⚠️ Stack {stack_name} does not exist. Nothing to delete.")
 
-    # Always print the stack name at the end
     print(f"📌 Managed stack: {stack_name}")
 
 if __name__ == "__main__":
