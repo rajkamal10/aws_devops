@@ -3,7 +3,6 @@ import os
 import yaml
 from botocore.exceptions import ClientError
 
-# Load stack configuration
 with open("values.yml") as f:
     values = yaml.safe_load(f)
 
@@ -28,9 +27,7 @@ def stack_exists(name):
 if __name__ == "__main__":
     if stack_exists(stack_name):
         print(f"🔄 Stack {stack_name} already exists.")
-        print(f"➡️ Action: Stack would be UPDATED.")
+        print(f"🚀 Stack status for this PR:\n➡️ Action: Stack {stack_name} will be UPDATED.")
     else:
         print(f"🆕 Stack {stack_name} does not exist.")
-        print(f"➡️ Action: Stack would be CREATED.")
-
-    print(f"📌 Managed stack: {stack_name}")
+        print(f"🚀 Stack status for this PR:\n➡️ Action: Stack {stack_name} will be CREATED.")
