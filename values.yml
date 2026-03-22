@@ -6,6 +6,7 @@ stacks:
 
   dynamo_db:
     template: template/DynamoDB.yml
+    region: ap-south-1
     TableName: terraform-locks-dev
     PartitionKeyName: LockID
     PartitionKeyType: S
