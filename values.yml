@@ -4,7 +4,12 @@ stacks:
     region: ap-south-1
     base_name: s3-app-stack
 
-  s3-app:
-    template: template/s3.yml
+  dynamo_db:
+    template: template/DynamoDB.yml
     region: ap-south-1
-    base_name: s3-app-prod
+    base_name: terraform-locks-dev
+    TableName: terraform-locks-dev
+    PartitionKeyName: LockID
+    PartitionKeyType: S
+    BillingMode: PAY_PER_REQUEST
+
