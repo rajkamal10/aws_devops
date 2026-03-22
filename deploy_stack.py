@@ -1,13 +1,25 @@
 import boto3
 import os
 import yaml
+import sys
 from botocore.exceptions import ClientError
 
 # Load stack configuration
 with open("values.yml") as f:
     values = yaml.safe_load(f)
 
-stack_config = values["stacks"]["s3-app"]
+# Require a stack key argument
+if len(sys.argv) < 2:
+    print("❌ Please provide a stack key (e.g., dynamo_db, s3_app).")
+    sys.exit(1)
+
+stack_key = sys.argv[1]
+if stack_key not in values["stacks"]:
+    print(f"❌ Stack key '{stack_key}' not found in values.yml.")
+    sys.exit(1)
+
+stack_config = values["stacks"][stack_key]
+
 region = stack_config["region"]
 template_file = stack_config["template"]
 base_name = stack_config["base_name"]
@@ -28,12 +40,19 @@ def stack_exists(name):
 
 def deploy_stack():
     body = open(template_file).read()
+    parameters = [
+        {"ParameterKey": k, "ParameterValue": str(v)}
+        for k, v in stack_config.items()
+        if k not in ["template", "region", "base_name"]
+    ]
+
     if stack_exists(stack_name):
         print(f"➡️ Deploying: Updating stack {stack_name}...")
         try:
             cf.update_stack(
                 StackName=stack_name,
                 TemplateBody=body,
+                Parameters=parameters,
                 Capabilities=["CAPABILITY_NAMED_IAM"]
             )
             waiter = cf.get_waiter("stack_update_complete")
@@ -49,6 +68,7 @@ def deploy_stack():
         cf.create_stack(
             StackName=stack_name,
             TemplateBody=body,
+            Parameters=parameters,
             Capabilities=["CAPABILITY_NAMED_IAM"]
         )
         waiter = cf.get_waiter("stack_create_complete")
