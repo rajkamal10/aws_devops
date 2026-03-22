@@ -8,8 +8,13 @@ from botocore.exceptions import ClientError
 with open("values.yml") as f:
     values = yaml.safe_load(f)
 
-# Use provided stack key or default to dynamo_db
-stack_key = sys.argv[1] if len(sys.argv) > 1 else "nothing"
+# Default stack key
+default_stack_key = "dynamo_db"
+
+# Pick stack key: argument if provided, otherwise default
+stack_key = default_stack_key
+if len(sys.argv) > 1:
+    stack_key = sys.argv[1]
 
 if stack_key not in values["stacks"]:
     print(f"❌ Stack key '{stack_key}' not found in values.yml.")
