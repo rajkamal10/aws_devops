@@ -3,6 +3,11 @@ stacks:
     template: template/s3.yml
     region: ap-south-1
     base_name: s3-app-stack
+    
+  s3-terragrunt:
+    template: template/s3.yml
+    region: ap-south-1
+    base_name: terragrunt-bucket-8510322
 
   dynamo_db:
     template: template/DynamoDB.yml
